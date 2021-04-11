@@ -69,7 +69,9 @@ namespace Assignment1
         {
             WriteHeading("Movies A-Z");
 
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title, ReleaseDate DESC";
+            string sql = @"SELECT Title, YEAR(ReleaseDate) AS ReleaseYear
+                            FROM Movie 
+                            ORDER BY Title, ReleaseDate DESC";
             using SqlCommand command = new SqlCommand(sql, connection);
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -85,7 +87,9 @@ namespace Assignment1
         {
             WriteHeading("Movies by release date");
 
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY ReleaseDate DESC, Title";
+            string sql = @"SELECT Title, YEAR(ReleaseDate) AS ReleaseYear
+                            FROM Movie
+                            ORDER BY ReleaseDate DESC, Title";
             using SqlCommand command = new SqlCommand(sql, connection);
             using SqlDataReader reader = command.ExecuteReader();
 
@@ -102,13 +106,16 @@ namespace Assignment1
             WriteHeading("Find movies by year");
 
             Console.Write("Year: ");
+
             try
             {
                 int year = int.Parse(Console.ReadLine());
                 Console.WriteLine();
                 WriteHeading("Movies from " + year);
 
-                string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year ORDER BY Title, ReleaseDate DESC";
+                string sql = @"SELECT Title, YEAR(ReleaseDate) AS ReleaseYear
+                                FROM Movie WHERE YEAR(ReleaseDate) = @Year
+                                ORDER BY Title, ReleaseDate DESC";
                 using SqlCommand command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@Year", year);
                 command.ExecuteNonQuery();
@@ -167,12 +174,12 @@ namespace Assignment1
 
         private static void DeleteMovie()
         {
-            WriteHeading("Movies A-Z");
-
             List<string> options = new List<string>();
             List<int> movieIds = new List<int>();
 
-            string sql = "SELECT ID, Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title";
+            string sql = @"SELECT ID, Title, YEAR(ReleaseDate) AS ReleaseYear
+                            FROM Movie
+                            ORDER BY Title";
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
                 using SqlDataReader reader = command.ExecuteReader();
@@ -205,8 +212,6 @@ namespace Assignment1
 
             Console.Clear();
             Console.WriteLine("Movie " + options[selectedIndex] + " deleted!");
-
-            // TODO: Delete movie from database.
         }
 
         // The third parameter is the default option, which allows us to, for example, "remember" where the user was when they return to the main menu.

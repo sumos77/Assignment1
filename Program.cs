@@ -135,7 +135,7 @@ namespace Assignment1
             catch
             {
                 Console.Clear();
-                Console.WriteLine("Only numbers can be used for dates!");
+                Console.WriteLine("Year is not of a valid format!");
             }
         }
 

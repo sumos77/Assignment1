@@ -102,23 +102,30 @@ namespace Assignment1
             WriteHeading("Find movies by year");
 
             Console.Write("Year: ");
-            string year = Console.ReadLine();
-
-            Console.WriteLine();
-            WriteHeading("Movies from " + year);
-
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year ORDER BY Title, ReleaseDate DESC";
-            using SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Year", year);
-            command.ExecuteNonQuery();
-
-            using SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                string title = Convert.ToString(reader["Title"]);
-                string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
-                Console.WriteLine("- " + title + " " + releaseYear);
+                int year = int.Parse(Console.ReadLine());
+                Console.WriteLine();
+                WriteHeading("Movies from " + year);
+
+                string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year ORDER BY Title, ReleaseDate DESC";
+                using SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Year", year);
+                command.ExecuteNonQuery();
+
+                using SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string title = Convert.ToString(reader["Title"]);
+                    string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
+                    Console.WriteLine("- " + title + " " + releaseYear);
+                }
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("Only numbers can be used for dates!");
             }
         }
 
@@ -131,22 +138,31 @@ namespace Assignment1
 
             Console.WriteLine("Release date:");
             Console.Write("Year: ");
-            int year = int.Parse(Console.ReadLine());
-            Console.Write("Month (1-12): ");
-            int month = int.Parse(Console.ReadLine());
-            Console.Write("Day (1-31): ");
-            int day = int.Parse(Console.ReadLine());
+            
+            try
+            {
+                int year = int.Parse(Console.ReadLine());
+                Console.Write("Month (1-12): ");
+                int month = int.Parse(Console.ReadLine());
+                Console.Write("Day (1-31): ");
+                int day = int.Parse(Console.ReadLine());
 
-            string releaseDate = year + "-" + month + "-" + day;
+                string releaseDate = year + "-" + month + "-" + day;
 
-            string sql = "INSERT INTO Movie (Title,ReleaseDate) Values (@Title, @ReleaseDate)";
-            using SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@Title", title);
-            command.Parameters.AddWithValue("@ReleaseDate", releaseDate);
-            command.ExecuteNonQuery();
+                string sql = "INSERT INTO Movie (Title,ReleaseDate) Values (@Title, @ReleaseDate)";
+                using SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Title", title);
+                command.Parameters.AddWithValue("@ReleaseDate", releaseDate);
+                command.ExecuteNonQuery();
 
-            Console.Clear();
-            Console.WriteLine("Movie " + title + " (" + year + ") " + "added!");
+                Console.Clear();
+                Console.WriteLine("Movie " + title + " (" + year + ") " + "added!");
+            }
+            catch
+            {
+                Console.Clear();
+                Console.WriteLine("Only numbers can be used for dates!");
+            }
         }
 
         private static void DeleteMovie()
@@ -159,18 +175,16 @@ namespace Assignment1
             string sql = "SELECT ID, Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title";
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
-                using (SqlDataReader reader = command.ExecuteReader())
+                using SqlDataReader reader = command.ExecuteReader();
+                
+                while (reader.Read())
                 {
+                    int id = Convert.ToInt32(reader["ID"]);
+                    movieIds.Add(id);
 
-                    while (reader.Read())
-                    {
-                        int id = Convert.ToInt32(reader["ID"]);
-                        movieIds.Add(id);
-
-                        string title = Convert.ToString(reader["Title"]);
-                        string releaseYear = Convert.ToString(reader["ReleaseYear"]);
-                        options.Add(title + " (" + releaseYear + ")");
-                    }
+                    string title = Convert.ToString(reader["Title"]);
+                    string releaseYear = Convert.ToString(reader["ReleaseYear"]);
+                    options.Add(title + " (" + releaseYear + ")");
                 }
             }
 

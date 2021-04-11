@@ -71,7 +71,7 @@ namespace Assignment1
 
             WriteHeading("Movies A-Z");
 
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title";
+            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title, ReleaseDate DESC";
             SqlCommand command = new SqlCommand(sql, connection);
             SqlDataReader reader = command.ExecuteReader();
 
@@ -79,7 +79,7 @@ namespace Assignment1
             {
                 string title = Convert.ToString(reader["Title"]);
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
-                Console.WriteLine(title + " " + releaseYear);
+                Console.WriteLine("- " + title + " " + releaseYear);
             }
 
             connection.Close();
@@ -93,7 +93,7 @@ namespace Assignment1
 
             WriteHeading("Movies by release date");
 
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY ReleaseDate DESC";
+            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY ReleaseDate DESC, Title";
             SqlCommand command = new SqlCommand(sql, connection);
             SqlDataReader reader = command.ExecuteReader();
 
@@ -101,7 +101,7 @@ namespace Assignment1
             {
                 string title = Convert.ToString(reader["Title"]);
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
-                Console.WriteLine(title + " " + releaseYear);
+                Console.WriteLine("- " + title + " " + releaseYear);
             }
 
             connection.Close();
@@ -121,7 +121,7 @@ namespace Assignment1
             Console.WriteLine();
             WriteHeading("Movies from " + year);
 
-            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year";
+            string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year ORDER BY Title, ReleaseDate DESC";
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@Year", year);
             command.ExecuteNonQuery();
@@ -132,7 +132,7 @@ namespace Assignment1
             {
                 string title = Convert.ToString(reader["Title"]);
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
-                Console.WriteLine(title + " " + releaseYear);
+                Console.WriteLine("- " + title + " " + releaseYear);
             }
 
             connection.Close();
@@ -193,6 +193,13 @@ namespace Assignment1
                 string title = Convert.ToString(reader["Title"]);
                 string releaseYear = Convert.ToString(reader["ReleaseYear"]);
                 options.Add(title + " (" + releaseYear + ")");
+            }
+
+            if (options.Count == 0)
+            {
+                connection.Close();
+                Console.WriteLine("There are no movies to delete.");
+                return;
             }
 
             int selectedIndex = ShowMenu("Delete movie", options.ToArray());

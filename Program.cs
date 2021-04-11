@@ -157,7 +157,8 @@ namespace Assignment1
                 Console.Write("Day (1-31): ");
                 int day = int.Parse(Console.ReadLine());
 
-                string releaseDate = year + "-" + month + "-" + day;
+                DateTime isValidDate = new DateTime(year, month, day);
+                string releaseDate = isValidDate.ToString("yyyy-MM-dd");
 
                 string sql = "INSERT INTO Movie (Title,ReleaseDate) Values (@Title, @ReleaseDate)";
                 using SqlCommand command = new SqlCommand(sql, connection);
@@ -171,7 +172,7 @@ namespace Assignment1
             catch
             {
                 Console.Clear();
-                Console.WriteLine("Only numbers can be used for dates!");
+                Console.WriteLine("Date is not of a valid format!");
             }
         }
 
@@ -201,7 +202,6 @@ namespace Assignment1
 
             if (options.Count == 0)
             {
-                connection.Close();
                 Console.WriteLine("There are no movies to delete.");
                 return;
             }

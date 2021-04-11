@@ -17,7 +17,7 @@ namespace Assignment1
 
             // Connect to the database.
             connection = new SqlConnection(@"Data Source=(local)\SQLExpress;Initial Catalog=Assignment1;Integrated Security=SSPI;");
-            //connection.Open();
+            connection.Open();
 
             bool done = false;
             // We declare the choice here because we want to remember the previous one on each iteration and pass it as the "defaultOption" parameter to ShowMenu, for improved usability.
@@ -67,13 +67,11 @@ namespace Assignment1
 
         private static void ListMoviesAlphabetically()
         {
-            connection.Open();
-
             WriteHeading("Movies A-Z");
 
             string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title, ReleaseDate DESC";
-            SqlCommand command = new SqlCommand(sql, connection);
-            SqlDataReader reader = command.ExecuteReader();
+            using SqlCommand command = new SqlCommand(sql, connection);
+            using SqlDataReader reader = command.ExecuteReader();
 
             while (reader.Read())
             {
@@ -81,21 +79,15 @@ namespace Assignment1
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
                 Console.WriteLine("- " + title + " " + releaseYear);
             }
-
-            connection.Close();
-
-            // TODO: Get movies from database.
         }
 
         private static void ListMoviesByReleaseDate()
         {
-            connection.Open();
-
             WriteHeading("Movies by release date");
 
             string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY ReleaseDate DESC, Title";
-            SqlCommand command = new SqlCommand(sql, connection);
-            SqlDataReader reader = command.ExecuteReader();
+            using SqlCommand command = new SqlCommand(sql, connection);
+            using SqlDataReader reader = command.ExecuteReader();
 
             while (reader.Read())
             {
@@ -103,16 +95,10 @@ namespace Assignment1
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
                 Console.WriteLine("- " + title + " " + releaseYear);
             }
-
-            connection.Close();
-
-            // TODO: Get movies from database.
         }
 
         private static void FindMoviesByYear()
         {
-            connection.Open();
-
             WriteHeading("Find movies by year");
 
             Console.Write("Year: ");
@@ -122,11 +108,11 @@ namespace Assignment1
             WriteHeading("Movies from " + year);
 
             string sql = "SELECT Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie WHERE YEAR(ReleaseDate) = @Year ORDER BY Title, ReleaseDate DESC";
-            SqlCommand command = new SqlCommand(sql, connection);
+            using SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@Year", year);
             command.ExecuteNonQuery();
 
-            SqlDataReader reader = command.ExecuteReader();
+            using SqlDataReader reader = command.ExecuteReader();
 
             while (reader.Read())
             {
@@ -134,16 +120,10 @@ namespace Assignment1
                 string releaseYear = "(" + Convert.ToString(reader["ReleaseYear"]) + ")";
                 Console.WriteLine("- " + title + " " + releaseYear);
             }
-
-            connection.Close();
-
-            // TODO: Get movies from database.
         }
 
         private static void AddMovie()
         {
-            connection.Open();
-
             WriteHeading("Add movie");
 
             Console.Write("Title: ");
@@ -160,39 +140,38 @@ namespace Assignment1
             string releaseDate = year + "-" + month + "-" + day;
 
             string sql = "INSERT INTO Movie (Title,ReleaseDate) Values (@Title, @ReleaseDate)";
-            SqlCommand command = new SqlCommand(sql, connection);
+            using SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@Title", title);
             command.Parameters.AddWithValue("@ReleaseDate", releaseDate);
             command.ExecuteNonQuery();
 
             Console.Clear();
             Console.WriteLine("Movie " + title + " (" + year + ") " + "added!");
-
-            connection.Close();
-
-            // TODO: Add movie to database.
         }
 
         private static void DeleteMovie()
         {
-            connection.Open();
-
             WriteHeading("Movies A-Z");
 
             List<string> options = new List<string>();
             List<int> movieIds = new List<int>();
 
             string sql = "SELECT ID, Title, YEAR(ReleaseDate) AS ReleaseYear FROM Movie ORDER BY Title";
-            SqlCommand command = new SqlCommand(sql, connection);
-            SqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
+            using (SqlCommand command = new SqlCommand(sql, connection))
             {
-                int id = Convert.ToInt32(reader["ID"]);
-                movieIds.Add(id);
-                string title = Convert.ToString(reader["Title"]);
-                string releaseYear = Convert.ToString(reader["ReleaseYear"]);
-                options.Add(title + " (" + releaseYear + ")");
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+
+                    while (reader.Read())
+                    {
+                        int id = Convert.ToInt32(reader["ID"]);
+                        movieIds.Add(id);
+
+                        string title = Convert.ToString(reader["Title"]);
+                        string releaseYear = Convert.ToString(reader["ReleaseYear"]);
+                        options.Add(title + " (" + releaseYear + ")");
+                    }
+                }
             }
 
             if (options.Count == 0)
@@ -205,18 +184,13 @@ namespace Assignment1
             int selectedIndex = ShowMenu("Delete movie", options.ToArray());
             int selectedMovieId = movieIds[selectedIndex];
 
-            connection.Close();
-            connection.Open();
-
             sql = "DELETE FROM Movie WHERE ID = @MovieId";
-            command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@MovieId", selectedMovieId);
-            command.ExecuteNonQuery();
+            using SqlCommand deleteCommand = new SqlCommand(sql, connection);
+            deleteCommand.Parameters.AddWithValue("@MovieId", selectedMovieId);
+            deleteCommand.ExecuteNonQuery();
 
             Console.Clear();
             Console.WriteLine("Movie " + options[selectedIndex] + " deleted!");
-
-            connection.Close();
 
             // TODO: Delete movie from database.
         }

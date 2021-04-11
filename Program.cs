@@ -157,8 +157,8 @@ namespace Assignment1
                 Console.Write("Day (1-31): ");
                 int day = int.Parse(Console.ReadLine());
 
-                DateTime isValidDate = new DateTime(year, month, day);
-                string releaseDate = isValidDate.ToString("yyyy-MM-dd");
+                DateTime validDate = new DateTime(year, month, day);
+                string releaseDate = validDate.ToString("yyyy-MM-dd");
 
                 string sql = "INSERT INTO Movie (Title,ReleaseDate) Values (@Title, @ReleaseDate)";
                 using SqlCommand command = new SqlCommand(sql, connection);
